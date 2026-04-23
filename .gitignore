@@ -1,0 +1,66 @@
+# =====================================================================
+# FeRReT — .gitignore
+# =====================================================================
+
+# --- Sistema operativo ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- IDEs y editores ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# --- DBeaver ---
+.dbeaver/
+.dbeaver-data-sources.xml
+.Bak_dbeaver-data-sources.xml
+.metadata/
+
+# --- PostgreSQL: dumps y datos locales ---
+*.dump
+*.sql.gz
+*.backup
+*.bak
+pg_dump_*.sql
+dumps/
+backups/
+
+# --- Python (si usamos scripts/ con Faker) ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- Variables de entorno y secretos ---
+.env
+.env.*
+!.env.example
+*.secret
+credenciales.*
+config.local.*
+
+# --- Logs y temporales ---
+*.log
+logs/
+tmp/
+temp/
+
+# --- Dalibo / PEV2 exportados grandes ---
+# (dejamos los diagramas PNG pero ignoramos JSON crudo muy pesado si aparece)
+# docs/dalibo/*.json.bak
+
+# --- Archivos del sistema de memoria de Claude (personal de cada dev) ---
+.claude/
