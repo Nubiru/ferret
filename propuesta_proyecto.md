@@ -49,15 +49,15 @@ Uso de GIN: Búsqueda de términos en el temario_detallado de cada curso para en
 Uso de GiST: Control de la vigencia_matricula (fecha inicio y fin) de los alumnos usando Ranges (daterange), para validar accesos activos.
 
 
-┌───────────────────────────┬─────────────┬───────────────────────────────────────────────────────────────────────────────────────────────┐   
+  ┌───────────────────────────┬─────────────┬───────────────────────────────────────────────────────────────────────────────────────────────┐   
   │            Rol            │ Responsable │                                          Entregables                                          │
   ├───────────────────────────┼─────────────┼───────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ 🧱 Modelado & DER         │   Frederick1824  │ DER 3NF, DDL (schema.sql), documentación conceptual                                           │
+  │ 🧱 Modelado & DER         │Frederick1824│ DER 3NF, DDL (schema.sql), documentación conceptual                                           │
   ├───────────────────────────┼─────────────┼───────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ 📦 Carga masiva           │  LautaroAi │ Scripts de seed (seed.sql / Python con Faker), llegar al 1M, verificar integridad               │   
+  │ 📦 Carga masiva           │  LautaroAi  │ Scripts de seed (seed.sql / Python con Faker), llegar al 1M, verificar integridad             │   
   ├───────────────────────────┼─────────────┼───────────────────────────────────────────────────────────────────────────────────────────────┤   
-  │ ⚡ Indexación &           │  marianof87  │ Índices (B-Tree, Hash, GIN, GiST), EXPLAIN ANALYZE antes/después, 2 Dalibo/PEV2,              │   
+  │ ⚡ Indexación &            │  marianof87 │ Índices (B-Tree, Hash, GIN, GiST), EXPLAIN ANALYZE antes/después, 2 Dalibo/PEV2,              │   
   │ Performance               │             │ pg_stat_statements                                                                            │   
   ├───────────────────────────┼─────────────┼───────────────────────────────────────────────────────────────────────────────────────────────┤
-  │ 🧠 SQL Avanzado           │ Nubiru   │ Window functions, CTEs recursivas, queries de negocio, validación con datos cargados          │   
+  │ 🧠 SQL Avanzado           │    Nubiru   │ Window functions, CTEs recursivas, queries de negocio, validación con datos cargados          │   
   └───────────────────────────┴─────────────┴───────────────────────────────────────────────────────────────────────────────────────────────┘  
