@@ -2,10 +2,6 @@
 -- FeRReT — Schema (Parte 1, Eje I)
 -- Base de Datos III — Proyecto Integrador
 -- =====================================================================
--- Este es un BORRADOR INICIAL. El stream "A. Modelado & DER" debe
--- revisarlo, ajustarlo y mantenerlo. Buscar "REVISAR" para puntos
--- abiertos de decisión.
--- =====================================================================
 
 -- Extensiones necesarias.
 CREATE EXTENSION IF NOT EXISTS btree_gist;   -- para EXCLUDE combinado (scalar = + range &&)
@@ -104,15 +100,9 @@ CREATE TABLE sku (
     codigo_barras     VARCHAR(20) NOT NULL UNIQUE,   -- candidato a índice Hash
     descripcion_variante VARCHAR(200) NOT NULL,      -- ej. "caja x100, 6x1 pulgada"
     precio_unitario   NUMERIC(12,2) NOT NULL CHECK (precio_unitario >= 0),
-    precio_alquiler_dia NUMERIC(12,2),               -- NULL si no es alquilable
     unidad_medida     VARCHAR(20) NOT NULL,          -- unidad, kg, m, caja, etc.
     peso_gramos       INTEGER,
-    es_alquilable     BOOLEAN NOT NULL DEFAULT FALSE,
-    activo            BOOLEAN NOT NULL DEFAULT TRUE,
-    CONSTRAINT sku_alquilable_precio CHECK (
-        (es_alquilable = FALSE AND precio_alquiler_dia IS NULL)
-        OR (es_alquilable = TRUE AND precio_alquiler_dia IS NOT NULL)
-    )
+    activo            BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- =====================================================================
@@ -232,11 +222,12 @@ CREATE TABLE viaje (
 -- Tabla "fact" que registra toda variación de stock.
 -- Referencias opcionales a venta / orden / viaje según el origen.
 
+-- Modificar se cambia de 20 a 30 la columna tipo
 CREATE TABLE movimiento_stock (
     id                BIGSERIAL PRIMARY KEY,
     sku_id            INTEGER NOT NULL REFERENCES sku(id),
     sucursal_id       INTEGER NOT NULL REFERENCES sucursal(id),
-    tipo              VARCHAR(20) NOT NULL CHECK (tipo IN ('entrada_compra','salida_venta','transferencia_entrada','transferencia_salida','ajuste')),
+    tipo              VARCHAR(30) NOT NULL CHECK (tipo IN ('entrada_compra','salida_venta','transferencia_entrada','transferencia_salida','ajuste')),
     cantidad          INTEGER NOT NULL,  -- puede ser negativo en ajustes
     fecha             TIMESTAMP NOT NULL DEFAULT NOW(),  -- candidato a B-Tree
     venta_id          BIGINT REFERENCES venta(id),
@@ -245,25 +236,7 @@ CREATE TABLE movimiento_stock (
 );
 
 -- =====================================================================
--- 10. ALQUILER DE HERRAMIENTAS (GiST con EXCLUDE)
--- =====================================================================
-
-CREATE TABLE alquiler (
-    id                BIGSERIAL PRIMARY KEY,
-    sku_id            INTEGER NOT NULL REFERENCES sku(id),
-    cliente_id        INTEGER NOT NULL REFERENCES cliente(id),
-    sucursal_id       INTEGER NOT NULL REFERENCES sucursal(id),
-    empleado_id       INTEGER NOT NULL REFERENCES empleado(id),
-    ventana           TSRANGE NOT NULL,          -- índice GiST + EXCLUDE
-    precio_total      NUMERIC(12,2) NOT NULL CHECK (precio_total >= 0),
-    estado            VARCHAR(20) NOT NULL CHECK (estado IN ('reservado','entregado','devuelto','cancelado')),
-    -- El mismo SKU no puede estar alquilado a dos clientes en ventanas que se solapen.
-    -- (btree_gist permite combinar = escalar con && de rango).
-    EXCLUDE USING GIST (sku_id WITH =, ventana WITH &&)
-);
-
--- =====================================================================
--- 11. PROMOCIONES (GiST con EXCLUDE sobre daterange)
+-- 10. PROMOCIONES (GiST con EXCLUDE sobre daterange)
 -- =====================================================================
 
 CREATE TABLE promocion (
@@ -275,15 +248,3 @@ CREATE TABLE promocion (
     -- Un mismo producto no puede tener dos promos activas que se pisen.
     EXCLUDE USING GIST (producto_id WITH =, vigencia WITH &&)
 );
-
--- =====================================================================
--- FIN DEL BORRADOR
--- =====================================================================
--- Puntos abiertos a revisar entre los 4:
---  1. ¿Precio del producto a nivel `sku` (como está) o con historial
---     de precios en tabla aparte (`precio_historia`)?
---  2. ¿Sumamos cuenta corriente para mayoristas (pagos parciales)?
---  3. ¿Auditoría/historial de cambios de stock más fina que `movimiento_stock`?
---  4. ¿`cliente_mayorista` como subtabla en vez de campos nullable?
---  5. Definir bien cuándo un SKU puede venderse y alquilarse a la vez.
--- =====================================================================
