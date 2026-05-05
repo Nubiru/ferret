@@ -111,6 +111,38 @@ Mientras A termina, los otros tres pueden ir leyendo el schema borrador y armand
 
 PERFORMANCE
 
+--Sin indice (forzado seq scan)
+QUERY PLAN
+"Bitmap Heap Scan on venta (cost=95.35..2509.71 rows=8135 width=53) (actual time=0.620..3.325 rows=8049.00 loops=1)"
+" Recheck Cond: (fecha_venta >= (now() - '30 days'::interval))"
+" Heap Blocks: exact=2209"
+" Buffers: shared hit=2218"
+" -> Bitmap Index Scan on idx_venta_fecha (cost=0.00..93.31 rows=8135 width=0) (actual time=0.414..0.414 rows=8049.00 loops=1)"
+" Index Cond: (fecha_venta >= (now() - '30 days'::interval))"
+" Index Searches: 1"
+" Buffers: shared hit=9"
+"Planning:"
+" Buffers: shared hit=3"
+"Planning Time: 0.108 ms"
+"Execution Time: 3.534 ms"
+
+--Con indice
+
+QUERY PLAN
+"Bitmap Heap Scan on venta (cost=95.35..2509.71 rows=8135 width=53) (actual time=0.618..2.323 rows=8049.00 loops=1)"
+" Recheck Cond: (fecha_venta >= (now() - '30 days'::interval))"
+" Heap Blocks: exact=2209"
+" Buffers: shared hit=2218"
+" -> Bitmap Index Scan on idx_venta_fecha (cost=0.00..93.31 rows=8135 width=0) (actual time=0.432..0.432 rows=8049.00 loops=1)"
+" Index Cond: (fecha_venta >= (now() - '30 days'::interval))"
+" Index Searches: 1"
+" Buffers: shared hit=9"
+"Planning Time: 0.126 ms"
+"Execution Time: 2.524 ms"
+
+EXPLAIN ANALYZE SELECT \* FROM venta WHERE fecha_venta > NOW() - INTERVAL '30 days';
+
+QUERY PLAN
 "Bitmap Heap Scan on venta (cost=93.39..2503.32 rows=7882 width=53) (actual time=0.593..5.874 rows=8049.00 loops=1)"
 " Recheck Cond: (fecha_venta > (now() - '30 days'::interval))"
 " Heap Blocks: exact=2209"
