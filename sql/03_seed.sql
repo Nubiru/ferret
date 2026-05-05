@@ -1,113 +1,147 @@
--- =====================================================================
--- FeRReT — Carga masiva de datos (≥ 1.000.000 registros)
--- Base de Datos III — Proyecto Integrador, Parte 1
--- =====================================================================
--- Responsable: Stream B (Carga Masiva)
---
--- Orden de carga (respetar dependencias de FKs):
---   1. sucursal        →  6
---   2. camion          →  ~15
---   3. cargo           →  ~20 (catálogo de cargos)
---   4. empleado        →  ~200  (organigrama: raíz primero, después niveles)
---   5. marca           →  ~200
---   6. categoria       →  ~250  (raíces → hijas → nietos)
---   7. producto        →  ~30.000
---   8. sku             →  ~80.000
---   9. stock           →  ~480.000 (80k SKUs × 6 ubicaciones)
---  10. proveedor       →  ~300
---  11. cliente         →  ~150.000
---  12. orden_compra    →  ~20.000
---  13. orden_compra_linea → ~80.000
---  14. viaje           →  ~5.000
---  15. venta           →  ~250.000
---  16. venta_linea     →  ~800.000
---  17. movimiento_stock → ~150.000
---  18. alquiler        →  ~15.000   (cuidado con el EXCLUDE por solapamiento)
---  19. promocion       →  ~1.000    (cuidado con el EXCLUDE por solapamiento)
---
--- Tips:
---  - Envolver en BEGIN; ... COMMIT; los bloques grandes.
---  - Usar generate_series + random() + md5() para generar volumen.
---  - Usar Faker (Python) en scripts/ si se quieren datos más realistas.
---  - Desactivar constraints que se puedan desactivar durante la carga
---    y verificar al final con VACUUM ANALYZE.
--- =====================================================================
 
-BEGIN;
+-- =========================================================
+-- 1. SUCURSALES (6)
+-- =========================================================
+INSERT INTO sucursal (nombre, direccion, ciudad, provincia, fecha_apertura)
+SELECT 
+    'Sucursal ' || i,
+    'Calle ' || i,
+    'Ciudad ' || i,
+    'Provincia',
+    CURRENT_DATE - (i * 30)
+FROM generate_series(1, 6) i;
 
--- ---------------------------------------------------------------------
--- 1. Sucursales (5 sucursales + 1 depósito central)
--- ---------------------------------------------------------------------
--- TODO: INSERT INTO sucursal (...)
+-- =========================================================
+-- 2. CAMIONES (15)
+-- =========================================================
+INSERT INTO camion (patente, modelo, capacidad_kg, ano_fabricacion)
+SELECT 
+    'AAA' || i,
+    'Modelo ' || i,
+    (1000 + random()*5000)::int,
+    (2000 + random()*20)::int
+FROM generate_series(1, 15) i;
 
--- ---------------------------------------------------------------------
--- 2. Camiones
--- ---------------------------------------------------------------------
--- TODO: INSERT INTO camion (...) SELECT ... FROM generate_series(1, 15);
+-- =========================================================
+-- 3. CARGOS
+-- =========================================================
+INSERT INTO cargo (nombre, familia, salario_base) VALUES
+('CEO','ejecutivo',1000000),
+('Gerente','ejecutivo',700000),
+('Vendedor','venta',300000),
+('Administrativo','administrativo',250000),
+('Chofer','transporte',280000);
 
--- ---------------------------------------------------------------------
--- 3. Cargos
--- ---------------------------------------------------------------------
--- TODO: cargos por familia (ejecutivo, administrativo, caja, venta,
---       transporte, adquisicion, guardia)
+-- =========================================================
+-- 4. EMPLEADOS (~200)
+-- =========================================================
+INSERT INTO empleado (dni, nombre, apellido, email, fecha_ingreso, cargo_id, sucursal_id, supervisor_id)
+SELECT
+    'DNI' || i,
+    'Nombre' || i,
+    'Apellido' || i,
+    'emp' || i || '@mail.com',
+    CURRENT_DATE - (random()*1000)::int,
+    (1 + random()*4)::int,
+    (1 + random()*5)::int,
+    NULL
+FROM generate_series(1, 200) i;
 
--- ---------------------------------------------------------------------
--- 4. Empleados (organigrama, ~200)
--- ---------------------------------------------------------------------
--- Idea: insertar primero al CEO (supervisor_id = NULL) y luego ir bajando
--- por niveles usando CTEs o varias sentencias encadenadas.
+-- =========================================================
+-- 5. MARCAS (100)
+-- =========================================================
+INSERT INTO marca (nombre)
+SELECT 'Marca ' || i
+FROM generate_series(1, 100) i;
 
--- ---------------------------------------------------------------------
--- 5. Marcas
--- ---------------------------------------------------------------------
+-- =========================================================
+-- 6. CATEGORIAS (simples)
+-- =========================================================
+INSERT INTO categoria (nombre)
+SELECT 'Categoria ' || i
+FROM generate_series(1, 50) i;
 
--- ---------------------------------------------------------------------
--- 6. Categorías (jerarquía de 4–5 niveles)
--- ---------------------------------------------------------------------
+-- =========================================================
+-- 7. PRODUCTOS (30k)
+-- =========================================================
+INSERT INTO producto (nombre, categoria_id, marca_id, atributos)
+SELECT 
+    'Producto ' || i,
+    (1 + random()*49)::int,
+    (1 + random()*99)::int,
+    jsonb_build_object(
+        'color', (ARRAY['rojo','negro','azul'])[floor(random()*3)+1],
+        'material', (ARRAY['acero','plastico'])[floor(random()*2)+1]
+    )
+FROM generate_series(1, 30000) i;
 
--- ---------------------------------------------------------------------
--- 7. Productos (~30.000) con JSONB variado
--- ---------------------------------------------------------------------
--- Ejemplo de atributos (generar aleatoriamente dentro de un set acotado):
---   {"material":"acero","medida":"8mm","rosca":"metrica","color":"negro"}
+-- =========================================================
+-- 8. SKU (80k)
+-- =========================================================
+INSERT INTO sku (producto_id, codigo_barras, descripcion_variante, precio_unitario, unidad_medida)
+SELECT
+    (1 + random()*29999)::int,
+    'CB' || i,
+    'Variante ' || i,
+    (random()*1000)::numeric(10,2),
+    'unidad'
+FROM generate_series(1, 80000) i;
 
--- ---------------------------------------------------------------------
--- 8. SKUs (~80.000)
--- ---------------------------------------------------------------------
+-- =========================================================
+-- 9. STOCK (~480k)
+-- =========================================================
+INSERT INTO stock (sku_id, sucursal_id, cantidad)
+SELECT s.id, suc.id, (random()*500)::int
+FROM sku s CROSS JOIN sucursal suc;
 
--- ---------------------------------------------------------------------
--- 9. Stock (~480.000)
--- ---------------------------------------------------------------------
--- INSERT INTO stock (sku_id, sucursal_id, cantidad)
--- SELECT s.id, suc.id, (random()*500)::int
---   FROM sku s CROSS JOIN sucursal suc;
+-- =========================================================
+-- 10. CLIENTES (100k)
+-- =========================================================
+INSERT INTO cliente (tipo_cliente, nombre, email)
+SELECT 
+    'minorista',
+    'Cliente ' || i,
+    'cliente' || i || '@mail.com'
+FROM generate_series(1, 100000) i;
 
--- ---------------------------------------------------------------------
--- 10–14. Proveedores, Clientes, Órdenes de Compra, Viajes
--- ---------------------------------------------------------------------
+-- =========================================================
+-- 11. VENTAS (200k)
+-- =========================================================
+INSERT INTO venta (cliente_id, empleado_vendedor_id, sucursal_id, fecha_venta, tipo_venta, total, medio_pago)
+SELECT
+    (1 + random()*99999)::int,
+    (1 + random()*199)::int,
+    (1 + random()*5)::int,
+    NOW() - (random()*730)::int * INTERVAL '1 day',
+    'minorista',
+    (random()*10000)::numeric(10,2),
+    'efectivo'
+FROM generate_series(1, 200000) i;
 
--- ---------------------------------------------------------------------
--- 15. Ventas (~250.000) — distribuidas en un rango de fechas de ~2 años
--- ---------------------------------------------------------------------
+-- =========================================================
+-- 12. VENTA_LINEA (600k)
+-- =========================================================
+INSERT INTO venta_linea (venta_id, sku_id, cantidad, precio_unitario, subtotal)
+SELECT
+    (1 + random()*199999)::int,
+    (1 + random()*79999)::int,
+    (1 + random()*10)::int,
+    (random()*1000)::numeric(10,2),
+    (random()*10000)::numeric(10,2)
+FROM generate_series(1, 600000) i;
 
--- ---------------------------------------------------------------------
--- 16. Venta_linea (~800.000)
--- ---------------------------------------------------------------------
-
--- ---------------------------------------------------------------------
--- 17. Movimientos de stock
--- ---------------------------------------------------------------------
-
--- ---------------------------------------------------------------------
--- 18. Alquiler (ojo: EXCLUDE no permite solapamientos por sku)
--- ---------------------------------------------------------------------
--- Generar ventanas bien espaciadas o manejar excepciones.
-
--- ---------------------------------------------------------------------
--- 19. Promociones (ojo: EXCLUDE no permite solapamientos por producto)
--- ---------------------------------------------------------------------
+-- =========================================================
+-- 13. MOVIMIENTO STOCK (150k)
+-- =========================================================
+INSERT INTO movimiento_stock (sku_id, sucursal_id, tipo, cantidad, fecha)
+SELECT
+    (1 + random()*79999)::int,
+    (1 + random()*5)::int,
+    'salida_venta',
+    (random()*10)::int,
+    NOW() - (random()*365)::int * INTERVAL '1 day'
+FROM generate_series(1, 150000) i;
 
 COMMIT;
 
--- Al finalizar:
 VACUUM ANALYZE;
