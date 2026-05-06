@@ -1,0 +1,150 @@
+%% =====================================================================
+%% FeRReT — Diagrama Entidad-Relación (Mermaid)
+%% Renderiza nativo en GitHub. Pegar en cualquier .md como ```mermaid ...
+%% =====================================================================
+erDiagram
+    SUCURSAL ||--o{ EMPLEADO : "tiene"
+    SUCURSAL ||--o{ STOCK : "almacena"
+    SUCURSAL ||--o{ VENTA : "registra"
+    SUCURSAL ||--o{ MOVIMIENTO_STOCK : "registra"
+
+    CARGO ||--o{ EMPLEADO : "asigna"
+
+    EMPLEADO ||--o{ EMPLEADO : "supervisa"
+    EMPLEADO ||--o{ VENTA : "vende"
+
+    CATEGORIA ||--o{ CATEGORIA : "padre_de"
+    CATEGORIA ||--o{ PRODUCTO : "clasifica"
+
+    MARCA ||--o{ PRODUCTO : "marca"
+
+    PRODUCTO ||--o{ SKU : "variante"
+
+    SKU ||--o{ STOCK : "stock_en"
+    SKU ||--o{ VENTA_LINEA : "vendido_en"
+    SKU ||--o{ MOVIMIENTO_STOCK : "movido"
+
+    CLIENTE ||--o{ VENTA : "compra"
+
+    VENTA ||--o{ VENTA_LINEA : "detalle"
+
+    SUCURSAL {
+        int id PK
+        varchar nombre UK
+        varchar direccion
+        varchar ciudad
+        varchar provincia
+        varchar telefono
+        boolean es_deposito_central
+        date fecha_apertura
+        boolean activa
+    }
+
+    CAMION {
+        int id PK
+        varchar patente UK
+        varchar modelo
+        int capacidad_kg
+        smallint ano_fabricacion
+        boolean activo
+    }
+
+    CARGO {
+        int id PK
+        varchar nombre UK
+        varchar familia
+        numeric salario_base
+    }
+
+    EMPLEADO {
+        int id PK
+        varchar dni UK
+        varchar nombre
+        varchar apellido
+        varchar email UK
+        date fecha_ingreso
+        date fecha_baja
+        int cargo_id FK
+        int sucursal_id FK
+        int supervisor_id FK "auto-referencia"
+        boolean activo
+    }
+
+    CATEGORIA {
+        int id PK
+        varchar nombre
+        int padre_id FK "auto-referencia"
+    }
+
+    MARCA {
+        int id PK
+        varchar nombre UK
+    }
+
+    PRODUCTO {
+        int id PK
+        varchar nombre
+        int categoria_id FK
+        int marca_id FK
+        text descripcion_larga
+        jsonb atributos "GIN index"
+        boolean activo
+        timestamp fecha_alta
+    }
+
+    SKU {
+        int id PK
+        int producto_id FK
+        varchar codigo_barras UK "Hash index"
+        varchar descripcion_variante
+        numeric precio_unitario
+        varchar unidad_medida
+        int peso_gramos
+        boolean activo
+    }
+
+    STOCK {
+        int sku_id PK_FK
+        int sucursal_id PK_FK
+        int cantidad
+        int stock_minimo
+        timestamp ultima_actualizacion
+    }
+
+    CLIENTE {
+        int id PK
+        varchar tipo_cliente
+        varchar nombre
+        varchar email UK "Hash index"
+        timestamp fecha_alta
+        boolean activo
+    }
+
+    VENTA {
+        bigint id PK
+        int cliente_id FK
+        int empleado_vendedor_id FK
+        int sucursal_id FK
+        timestamp fecha_venta "B-Tree index"
+        varchar tipo_venta
+        numeric total
+        varchar medio_pago
+    }
+
+    VENTA_LINEA {
+        bigint id PK
+        bigint venta_id FK
+        int sku_id FK
+        int cantidad
+        numeric precio_unitario
+        numeric subtotal
+    }
+
+    MOVIMIENTO_STOCK {
+        bigint id PK
+        int sku_id FK
+        int sucursal_id FK
+        varchar tipo
+        int cantidad
+        timestamp fecha "B-Tree index"
+    }
