@@ -186,6 +186,24 @@ un Index Scan puro sería menos eficiente
 ❌ antes: Seq Scan (mal)
 ✅ ahora: Bitmap + Index (bien)
 
+Dalibo:
+
+VENTAS POR FECHA
+![alt text](image.png)
+
+VENTAS POR SUCURSAL Y FECHA
+![alt text](image-1.png)
+
+VENTAS POR CLIENTE
+![alt text](image-2.png)
+
+BUSQUEDA POR SKU (VENTA_LINEA)
+![alt text](image-3.png)
+
+costo estimado vs real
+filas esperadas vs reales
+tiempo por nodo
+
 ---
 
 ## Stream D — SQL Avanzado (Lógica de Negocio)

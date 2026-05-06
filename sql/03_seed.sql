@@ -1,3 +1,4 @@
+BEGIN;
 
 -- =========================================================
 -- 1. SUCURSALES (6)
@@ -55,7 +56,7 @@ SELECT 'Marca ' || i
 FROM generate_series(1, 100) i;
 
 -- =========================================================
--- 6. CATEGORIAS (simples)
+-- 6. CATEGORIAS (50)
 -- =========================================================
 INSERT INTO categoria (nombre)
 SELECT 'Categoria ' || i
@@ -92,7 +93,8 @@ FROM generate_series(1, 80000) i;
 -- =========================================================
 INSERT INTO stock (sku_id, sucursal_id, cantidad)
 SELECT s.id, suc.id, (random()*500)::int
-FROM sku s CROSS JOIN sucursal suc;
+FROM sku s
+CROSS JOIN sucursal suc;
 
 -- =========================================================
 -- 10. CLIENTES (100k)
