@@ -1,0 +1,7 @@
+# Dependencias instaladas localmente (cada quien las instala con pnpm/npm)
+node_modules/
+backend/node_modules/
+frontend/
+
+# Logs
+*.log
