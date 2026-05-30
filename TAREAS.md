@@ -212,20 +212,24 @@ tiempo por nodo
 
 **Entregables en `sql/04_queries.sql`:**
 
-- [ ] **Window Functions** (al menos 2):
-  - Ranking de top vendedores por sucursal (`RANK()` sobre total vendido).
-  - Running total mensual por sucursal (`SUM() OVER (PARTITION BY sucursal ORDER BY mes)`).
-  - Bonus: promedio móvil de ventas de los últimos 7 días.
+- [x] **Window Functions** (3 métricas analíticas):
+  - [x] Ranking de top vendedores por sucursal (`RANK()` sobre total vendido).
+  - [x] Running total mensual por sucursal (`SUM() OVER (PARTITION BY sucursal ORDER BY mes)`).
+  - [x] Bonus: promedio móvil de ventas de los últimos 7 días.
 
-- [ ] **CTE Recursiva #1** — Categorías:
-  - Dada una categoría raíz, traer todos sus descendientes con la ruta completa (ej. `Construcción > Fijaciones > Tornillos > Autoperforantes`).
-  - Contar productos totales por rama (incluyendo subcategorías).
+- [x] **CTE Recursiva #1** — Categorías:
+  - [x] Dada una categoría raíz, traer todos sus descendientes con la ruta completa (breadcrumb).
+  - [x] Contar productos totales por rama (incluyendo subcategorías de forma recursiva).
 
-- [ ] **CTE Recursiva #2** — Organigrama:
-  - Dado un empleado, traer toda la cadena de mando hacia arriba (hacia el CEO).
-  - Dado un gerente, traer todos los subordinados directos e indirectos.
+- [x] **CTE Recursiva #2** — Organigrama:
+  - [x] Dado un empleado, traer toda la cadena de mando hacia arriba (hacia el CEO).
+  - [x] Dado un gerente, traer todos los subordinados directos e indirectos (diagramado jerárquico con sangría).
 
-- [ ] Escribir cada query con un comentario que explique **qué pregunta de negocio responde**.
+- [x] Escribir cada query con un comentario que explique **qué pregunta de negocio responde**.
+- [x] **Automatización con Triggers** (`sql/05_triggers.sql`):
+  - [x] Definir disparadores `BEFORE` y `AFTER` para gestionar stock, garantizar precios y registrar movimientos de auditoría.
+  - [x] Usar pseudovariables `OLD` y `NEW` y lógica condicional en la función asociada.
+  - [x] Crear e integrar un script completo de verificación para eventos DML (`INSERT`, `UPDATE`, `DELETE`).
 
 **Puntos de atención:**
 
@@ -239,10 +243,11 @@ tiempo por nodo
 
 - [ ] `sql/01_schema.sql` aplica limpio en DB vacía.
 - [ ] `sql/03_seed.sql` carga ≥ 1.000.000 registros sin errores.
-- [ ] `sql/02_indexes.sql` crea todos los índices requeridos.
-- [ ] `sql/04_queries.sql` corre todas las consultas sin error.
+- [x] `sql/02_indexes.sql` crea todos los índices requeridos.
+- [x] `sql/04_queries.sql` corre todas las consultas sin error.
+- [x] `sql/05_triggers.sql` aplica limpio y pasa las verificaciones de reactividad DML de stock y auditoría.
 - [ ] DER exportado en `docs/`.
 - [ ] `docs/performance.md` con EXPLAIN ANALYZE antes/después.
 - [ ] 2 diagramas Dalibo en `docs/dalibo/`.
 - [ ] Top-5 de `pg_stat_statements` documentado.
-- [ ] README actualizado con instrucciones de reproducción.
+- [x] README actualizado con instrucciones de reproducción.

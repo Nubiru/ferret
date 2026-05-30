@@ -69,7 +69,8 @@ ferret/
 │   ├── 01_schema.sql         ← DDL normalizado 3NF
 │   ├── 02_indexes.sql        ← B-Tree / Hash / GIN / GiST + EXCLUDE
 │   ├── 03_seed.sql           ← generación masiva de datos (≥ 1M)
-│   └── 04_queries.sql        ← window functions + CTEs recursivas
+│   ├── 04_queries.sql        ← window functions + CTEs recursivas
+│   └── 05_triggers.sql       ← automatización de stock y auditoría de movimientos (triggers)
 └── scripts/                  ← generadores auxiliares (Python + Faker si hace falta)
 ```
 
@@ -81,4 +82,5 @@ psql -d ferret -f sql/01_schema.sql
 psql -d ferret -f sql/02_indexes.sql
 psql -d ferret -f sql/03_seed.sql   # demora varios minutos
 psql -d ferret -f sql/04_queries.sql
+psql -d ferret -f sql/05_triggers.sql
 ```
