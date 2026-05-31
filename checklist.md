@@ -23,11 +23,11 @@ Marquen con una `X` dentro de los corchetes `[ ]` (ej: `[x]`) las tareas complet
 
 ### C. Capa de Auditoría y Forense de Datos — ⬜ PENDIENTE
 
-- [ ] **1.** Crear la tabla física `audit_logs` con los campos necesarios para metadatos del sistema.
+- [x] **1.** Crear la tabla física `audit_logs` con los campos necesarios para metadatos del sistema.
 
-- [ ] **2.** Implementar bloques estructurados `EXCEPTION` en los puntos críticos de los scripts.
+- [x] **2.** Implementar bloques estructurados `EXCEPTION` en los puntos críticos de los scripts.
 
-- [ ] **3.** Utilizar `GET STACKED DIAGNOSTICS` para extraer de forma limpia el `RETURNED_SQLSTATE` y el `MESSAGE_TEXT`.
+- [x] **3.** Utilizar `GET STACKED DIAGNOSTICS` para extraer de forma limpia el `RETURNED_SQLSTATE` y el `MESSAGE_TEXT`.
 
 ### D. Seguridad y Blindaje (Hardening) — ✅ Gabriel (`scripts/06_seguridad_hardening.sql`)
 
