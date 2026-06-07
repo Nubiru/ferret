@@ -1,0 +1,5 @@
+# Dependencias (cada quien las instala con npm/pnpm install)
+node_modules/
+
+# Logs
+*.log
