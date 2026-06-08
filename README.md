@@ -68,15 +68,15 @@ Detalle completo con tipos y atributos en [`docs/DER/DER.mmd`](docs/DER/DER.mmd)
 
 | Consigna | Implementación | Archivo |
 |---|---|---|
-| DER 3NF | 13 tablas normalizadas, 2 jerarquías recursivas | [`sql/01_schema.sql`](sql/01_schema.sql) |
-| ≥ 1.000.000 registros | **1.74M** registros cargados | [`sql/03_seed.sql`](sql/03_seed.sql) |
-| Índice **B-Tree** | `venta.fecha_venta`, `(sucursal_id, fecha_venta)`, `cliente_id`, `sku`, etc. | [`sql/02_indexes.sql`](sql/02_indexes.sql) |
-| Índice **Hash** | `cliente.email`, `sku.codigo_barras` | [`sql/02_indexes.sql`](sql/02_indexes.sql) |
-| Índice **GIN** | `producto.atributos` JSONB con `jsonb_path_ops` | [`sql/02_indexes.sql`](sql/02_indexes.sql) |
-| EXPLAIN ANALYZE antes/después | Queries con `SET enable_seqscan/indexscan` | [`sql/04_queries.sql`](sql/04_queries.sql) |
+| DER 3NF | 13 tablas normalizadas, 2 jerarquías recursivas | [`Parte1/01_schema.sql`](Parte1/01_schema.sql) |
+| ≥ 1.000.000 registros | **1.74M** registros cargados | [`Parte1/03_seed.sql`](Parte1/03_seed.sql) |
+| Índice **B-Tree** | `venta.fecha_venta`, `(sucursal_id, fecha_venta)`, `cliente_id`, `sku`, etc. | [`Parte1/02_indexes.sql`](Parte1/02_indexes.sql) |
+| Índice **Hash** | `cliente.email`, `sku.codigo_barras` | [`Parte1/02_indexes.sql`](Parte1/02_indexes.sql) |
+| Índice **GIN** | `producto.atributos` JSONB con `jsonb_path_ops` | [`Parte1/02_indexes.sql`](Parte1/02_indexes.sql) |
+| EXPLAIN ANALYZE antes/después | Queries con `SET enable_seqscan/indexscan` | [`Parte1/04_queries.sql`](Parte1/04_queries.sql) |
 | Diagramas Dalibo PEV2 | 4 diagramas (1 por índice) | [`docs/dalibo/`](docs/dalibo/) |
-| Window Functions | `RANK()`, `SUM() OVER`, `AVG() OVER ROWS BETWEEN` | [`sql/05_advanced_sql.sql`](sql/05_advanced_sql.sql) |
-| CTE Recursiva | Categorías + Organigrama de empleados | [`sql/05_advanced_sql.sql`](sql/05_advanced_sql.sql) |
+| Window Functions | `RANK()`, `SUM() OVER`, `AVG() OVER ROWS BETWEEN` | [`Parte1/05_advanced_sql.sql`](Parte1/05_advanced_sql.sql) |
+| CTE Recursiva | Categorías + Organigrama de empleados | [`Parte1/05_advanced_sql.sql`](Parte1/05_advanced_sql.sql) |
 
 ---
 
@@ -139,7 +139,7 @@ Lookup de líneas de venta por SKU (tabla de 600k filas). Tiempo: **0.137 ms**.
 
 ## D. SQL Avanzado ([@Nubiru](https://github.com/Nubiru))
 
-Cinco consultas que combinan **Window Functions** y **CTEs Recursivas** sobre las dos jerarquías del modelo. Ver [`sql/05_advanced_sql.sql`](sql/05_advanced_sql.sql).
+Cinco consultas que combinan **Window Functions** y **CTEs Recursivas** sobre las dos jerarquías del modelo. Ver [`Parte1/05_advanced_sql.sql`](Parte1/05_advanced_sql.sql).
 
 ### Q1 — Top 3 vendedores por sucursal (`RANK()`)
 
@@ -230,32 +230,36 @@ ferret/
 ├── propuesta_proyecto.md     ← consigna oficial
 ├── proyecto_integrador.docx  ← consigna oficial
 ├── docs/
-│   ├── DER/
-│   │   ├── DER.mmd                          ← DER en Mermaid (texto)
-│   │   ├── Ndiagrama.png                    ← DER exportado
-│   │   └── postgres - ferret_db - public.png
-│   ├── DER.pdf.dbp                          ← proyecto DBeaver del DER
-│   └── dalibo/
-│       ├── 01_idx_venta_fecha.png
-│       ├── 02_idx_venta_sucursal_fecha.png
-│       ├── 03_idx_venta_cliente.png
-│       └── 04_idx_venta_linea_sku.png
-└── sql/
-    ├── 01_schema.sql         ← DDL normalizado 3NF
-    ├── 02_indexes.sql        ← B-Tree + Hash + GIN
-    ├── 03_seed.sql           ← carga masiva (1.74M registros)
-    ├── 04_queries.sql        ← EXPLAIN ANALYZE antes/después (Mariano)
-    └── 05_advanced_sql.sql   ← Window functions + CTEs recursivas (Gabriel)
+│   ├── checklists/           ← una checklist por Parte/Eje
+│   ├── DER/                  ← DER (Mermaid + export DBeaver)
+│   └── dalibo/               ← diagramas PEV2 de performance
+├── Parte1/                   ← Eje I: Optimización + SQL Avanzado
+│   ├── 01_schema.sql             ← DDL normalizado 3NF
+│   ├── 02_indexes.sql            ← B-Tree + Hash + GIN
+│   ├── 03_seed.sql               ← carga masiva (1.74M registros)
+│   ├── 04_queries.sql            ← EXPLAIN ANALYZE antes/después (Mariano)
+│   ├── 05_advanced_sql.sql       ← Window functions + CTEs recursivas (Gabriel)
+│   └── 06_pg_stat_statements.sql ← top-5 consultas (Mariano)
+├── Parte2/                   ← Eje II: Programación en el servidor (PL/pgSQL)
+│   ├── 05_procedures.sql          ← A: funciones/procedures (Federico)
+│   ├── 06_seguridad_hardening.sql ← D: SECURITY DEFINER (Gabriel)
+│   ├── 07_transacciones.sql       ← B: SAVEPOINT/ROLLBACK (Gabriel)
+│   ├── 08_auditoria_y_forense.sql ← C: auditoría y forense
+│   ├── 09_triggers.sql            ← E: triggers de stock + auditoría (Mariano)
+│   └── EJE2_plan.md               ← reparto y detalle del Eje II
+└── Parte3/                   ← Eje III: Caché Redis (Cache-Aside)
+    ├── Gabriel/              ← backend Express+PG+Redis: cache-aside + invalidación selectiva
+    └── Lautaro/             ← backend Express+PG+Redis: cache-aside (/api/catalogo)
 ```
 
 ## Cómo reproducirlo
 
 ```bash
 createdb ferret_db
-psql -d ferret_db -f sql/01_schema.sql      # 13 tablas
-psql -d ferret_db -f sql/03_seed.sql        # 1.74M registros (~50 seg)
-psql -d ferret_db -f sql/02_indexes.sql     # B-Tree + Hash + GIN
-psql -d ferret_db -f sql/05_advanced_sql.sql # Stream D
+psql -d ferret_db -f Parte1/01_schema.sql      # 13 tablas
+psql -d ferret_db -f Parte1/03_seed.sql        # 1.74M registros (~50 seg)
+psql -d ferret_db -f Parte1/02_indexes.sql     # B-Tree + Hash + GIN
+psql -d ferret_db -f Parte1/05_advanced_sql.sql # Stream D
 ```
 
-Los EXPLAIN comparativos de Stream C se corren a mano desde `sql/04_queries.sql` para poder copiar los planes JSON a [Dalibo PEV2](https://explain.dalibo.com/).
+Los EXPLAIN comparativos de Stream C se corren a mano desde `Parte1/04_queries.sql` para poder copiar los planes JSON a [Dalibo PEV2](https://explain.dalibo.com/).

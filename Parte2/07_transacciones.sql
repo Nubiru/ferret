@@ -20,7 +20,7 @@
 --   Ademas, una rutina con COMMIT/ROLLBACK no puede llevar un EXCEPTION
 --   en su bloque EXTERIOR ni una clausula SET (search_path). Por eso la
 --   Parte B vive en su propia PROCEDURE, separada de la funcion blindada
---   de la Parte D (scripts/06_seguridad_hardening.sql).
+--   de la Parte D (Parte2/06_seguridad_hardening.sql).
 -- =========================================================
 
 CREATE OR REPLACE PROCEDURE registrar_venta_completa(

@@ -1,10 +1,10 @@
 # Checklist — Proyecto Integrador · Parte 3 / Eje III (Caché con Redis)
 
 Capa de persistencia políglota: Redis como almacén clave-valor en memoria, patrón **Cache-Aside**.
-Implementado en [`eje4-api/`](../../eje4-api/) (mismo backend que comparte con el Eje IV).
+Implementado en [`Parte3/Gabriel/`](../../Parte3/Gabriel/) (mismo backend que comparte con el Eje IV).
 
 > **Reparto:** lógica de caché (`cache.js`) = **Gabriel**. Scaffold Express/pg/redis = equipo.
-> ⚠️ **Ojo con el nombre:** este es el Eje III **real** (Redis). El MongoDB/MEAN (`eje3-mean/`) es un **TP aparte**, no este eje.
+> Hay una segunda solución de la Parte 3 en [`Parte3/Lautaro/`](../../Parte3/Lautaro/) — el equipo decide cuál queda como oficial.
 
 ### 1. Fase de Diseño y Selección
 
@@ -15,7 +15,7 @@ Implementado en [`eje4-api/`](../../eje4-api/) (mismo backend que comparte con e
 
 ### 2. Configuración (Setup)
 
-- [x] Instalamos el cliente de Redis (`redis` en `eje4-api/package.json`).
+- [x] Instalamos el cliente de Redis (`redis` en `Parte3/Gabriel/package.json`).
 - [x] Conexión exitosa con el servidor de Redis (`redisClient.js`, validado contra Redis real vía podman).
 - [x] **Manejo de Errores (Fallback):** si Redis se cae, la app registra el error y sigue consultando PostgreSQL (`cacheAside` → rama `redis-caido`).
 
@@ -34,4 +34,4 @@ Implementado en [`eje4-api/`](../../eje4-api/) (mismo backend que comparte con e
 
 ---
 
-**Cómo correr y validar:** ver [`eje4-api/README.md`](../../eje4-api/README.md).
+**Cómo correr y validar:** ver [`Parte3/Gabriel/README.md`](../../Parte3/Gabriel/README.md).

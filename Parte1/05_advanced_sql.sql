@@ -10,10 +10,10 @@
 -- (creado en 02_indexes.sql) dentro de una window function.
 -- =====================================================================
 -- Orden de ejecución sugerido:
---   1. psql -d ferret -f sql/01_schema.sql
---   2. psql -d ferret -f sql/03_seed.sql
---   3. psql -d ferret -f sql/02_indexes.sql
---   4. psql -d ferret -f sql/05_advanced_sql.sql   <-- este archivo
+--   1. psql -d ferret -f Parte1/01_schema.sql
+--   2. psql -d ferret -f Parte1/03_seed.sql
+--   3. psql -d ferret -f Parte1/02_indexes.sql
+--   4. psql -d ferret -f Parte1/05_advanced_sql.sql   <-- este archivo
 -- =====================================================================
 
 

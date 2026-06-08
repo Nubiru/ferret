@@ -1,6 +1,6 @@
 # Checklist — Proyecto Integrador · Parte 4 / Eje IV (CRUD + Invalidación Selectiva)
 
-API REST sobre PostgreSQL con caché Redis consistente. Implementado en [`eje4-api/`](../../eje4-api/).
+API REST sobre PostgreSQL con caché Redis consistente. Implementado en [`Parte3/Gabriel/`](../../Parte3/Gabriel/).
 Entidad elegida: **`producto`** (ya tiene columna `activo` → baja lógica sin tocar el schema).
 
 > **Reparto:** invalidación selectiva (`cache.js`) = **Gabriel**. Scaffold + CRUD plano (`server.js`) = equipo
@@ -25,9 +25,9 @@ Entidad elegida: **`producto`** (ya tiene columna `activo` → baja lógica sin 
 
 ### Formato de Entrega
 
-- [ ] Repo actualizado con el backend (`eje4-api/`). *(falta el commit/PR)*
+- [ ] Repo actualizado con el backend (`Parte3/Gabriel/`). *(falta el commit/PR)*
 - [ ] Archivo con las capturas de Postman.
 
 ---
 
-**Cómo correr y probar en Postman:** ver [`eje4-api/README.md`](../../eje4-api/README.md).
+**Cómo correr y probar en Postman:** ver [`Parte3/Gabriel/README.md`](../../Parte3/Gabriel/README.md).

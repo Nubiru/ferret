@@ -1,4 +1,4 @@
-# eje4-api — Backend Express + PostgreSQL + Redis
+# Parte 3 (Gabriel) — Backend Express + PostgreSQL + Redis
 
 Backend compartido por **dos entregas del Proyecto Integrador**:
 
@@ -8,12 +8,11 @@ Backend compartido por **dos entregas del Proyecto Integrador**:
 | **IV** | Parte 4 | CRUD + **invalidación selectiva** de caché | `cache.js` → `invalidarNamespace()`, `server.js` |
 
 > ⚠️ Este backend habla con **PostgreSQL (`ferret_db`)** + **Redis** — la base relacional del proyecto.
-> No confundir con `eje3-mean/`, que es el **TP de MongoDB** (otra entrega, otro backend).
 
 ## Estructura
 
 ```
-eje4-api/
+Parte3/Gabriel/
 ├── server.js        ← Express: GET (cache) + POST/PUT/DELETE (CRUD + invalidación)
 ├── cache.js         ← ★ núcleo evaluado (Gabriel): cache-aside + invalidación selectiva
 ├── db.js            ← pool de PostgreSQL (ferret_db)
@@ -28,7 +27,7 @@ eje4-api/
 podman run -d --name ferret-redis -p 6380:6379 docker.io/library/redis:7
 
 # 2. Backend
-cd eje4-api
+cd Parte3/Gabriel
 npm install
 REDIS_URL=redis://localhost:6380 npm start      # usa ferret_db por socket local
 # → [api] escuchando en http://localhost:3000

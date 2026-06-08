@@ -24,7 +24,7 @@ cd ferret
 ```bash
 # Con psql instalado localmente
 createdb ferret
-psql -d ferret -f sql/01_schema.sql
+psql -d ferret -f Parte1/01_schema.sql
 ```
 
 Si preferís usar DBeaver: crear una conexión a la base `ferret` y correr los `.sql` desde ahí en orden.
@@ -56,7 +56,7 @@ git pull
 git checkout -b feature/A-modelado-der-inicial
 
 # 3. Trabajar. Commits chicos y con mensaje claro (ver abajo).
-git add sql/01_schema.sql
+git add Parte1/01_schema.sql
 git commit -m "esquema: agrega tabla promocion con exclusion gist"
 
 # 4. Pushear la rama
@@ -103,7 +103,7 @@ Semana 4  →  Integración + documentación + entrega
 ```
 
 **Mientras A está en curso:**
-- B puede ir leyendo el schema borrador (`sql/01_schema.sql`) y planificar los volúmenes.
+- B puede ir leyendo el schema borrador (`Parte1/01_schema.sql`) y planificar los volúmenes.
 - C puede ir pensando qué consultas va a medir y armando el template de `docs/performance.md`.
 - D puede ir escribiendo pseudo-SQL de las window functions y CTEs.
 
@@ -148,12 +148,12 @@ ferret/
 │   ├── DER.*                 ← diagrama exportado (PNG o PDF) — Stream A
 │   ├── performance.md        ← análisis EXPLAIN ANALYZE — Stream C
 │   └── dalibo/               ← 2 diagramas PEV2 — Stream C
-├── sql/
+├── Parte1/
 │   ├── 01_schema.sql         ← Stream A
 │   ├── 02_indexes.sql        ← Stream C
 │   ├── 03_seed.sql           ← Stream B
 │   └── 04_queries.sql        ← Stream D
-└── scripts/                  ← generadores auxiliares (Python/bash)
+└── Parte2/                  ← generadores auxiliares (Python/bash)
 ```
 
 ---
@@ -178,10 +178,10 @@ ferret/
 
 ## 9. Checklist final antes de la entrega
 
-- [ ] `sql/01_schema.sql` aplica limpio.
-- [ ] `sql/03_seed.sql` llega a ≥ 1.000.000 registros.
-- [ ] `sql/02_indexes.sql` crea todos los índices pedidos.
-- [ ] `sql/04_queries.sql` corre sin errores y devuelve resultados lógicos.
+- [ ] `Parte1/01_schema.sql` aplica limpio.
+- [ ] `Parte1/03_seed.sql` llega a ≥ 1.000.000 registros.
+- [ ] `Parte1/02_indexes.sql` crea todos los índices pedidos.
+- [ ] `Parte1/04_queries.sql` corre sin errores y devuelve resultados lógicos.
 - [ ] DER exportado en `docs/`.
 - [ ] `docs/performance.md` con EXPLAIN ANALYZE antes/después.
 - [ ] 2 diagramas Dalibo en `docs/dalibo/`.
