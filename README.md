@@ -84,3 +84,37 @@ psql -d ferret -f sql/03_seed.sql   # demora varios minutos
 psql -d ferret -f sql/04_queries.sql
 psql -d ferret -f sql/05_triggers.sql
 ```
+Los EXPLAIN comparativos de Stream C se corren a mano desde `sql/04_queries.sql` para poder copiar los planes JSON a [Dalibo PEV2](https://explain.dalibo.com/).
+
+---
+
+## Checklist: Integración de Caché con Redis (Proyecto Integrador - Parte 3)
+
+Esta sección detalla el progreso de la implementación de la capa de persistencia políglota utilizando Redis como almacén clave-valor en memoria.
+
+HAGA FOCO EN:
+. Implementación del Patrón Cache-Aside
+- [x] **Consulta a la Caché:** El endpoint verifica primero si la clave existe en Redis.
+- [x] **Cache HIT:** Si el dato existe, se retorna inmediatamente al cliente (se evita ir a la DB).
+- [x] **Cache MISS (Consulta a la DB):** Si el dato NO existe, el sistema realiza la consulta a la base de datos principal (PostgreSQL, MongoDB, etc.).
+- [x] **Población de la Caché:** Guardamos el resultado obtenido de la base de datos en Redis.
+- [x] Devolver la respuesta final al cliente en todos los flujos.
+
+### Configuración e Inicio de Redis y Backend
+
+1. **Iniciar un servidor Redis local** (por ejemplo, con Docker o Podman):
+   ```bash
+   docker run -d --name ferret-redis -p 6379:6379 redis:alpine
+   ```
+
+2. **Instalar las dependencias e iniciar el backend**:
+   ```bash
+   cd eje3-mean/backend
+   npm install
+   node server.js
+   ```
+
+3. **Verificar el flujo de Caché**:
+   - En la primera petición a `http://localhost:3000/api/reporte-ventas` (Cache MISS), se consultará MongoDB, se guardará en Redis bajo la clave `reports:sales_by_category` con un TTL de 60 segundos, y se retornará.
+   - En peticiones subsiguientes dentro del período de 60 segundos (Cache HIT), la respuesta se servirá de forma ultra-rápida directamente desde Redis.
+
