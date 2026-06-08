@@ -1,5 +1,5 @@
 {
-  "name": "ferret-eje4-api",
+  "name": "ferret-parte3-gabriel",
   "version": "1.0.0",
   "description": "Backend Express + PostgreSQL + Redis — Eje III (Cache-Aside) y Eje IV (CRUD + invalidacion selectiva)",
   "type": "module",

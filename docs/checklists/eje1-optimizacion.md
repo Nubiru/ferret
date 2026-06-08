@@ -7,11 +7,11 @@ PostgreSQL. Marquen `[x]` lo completado. Cada casilla debe tener respaldo en có
 - [x] **1.** Documentación del concepto del negocio (`propuesta_proyecto.md` / `README.md`).
 - [x] **2.** DER normalizado a 3NF, exportado (`docs/DER/`).
 
-### B. Carga Masiva de Datos — Lautaro (`sql/03_seed.sql`)
+### B. Carga Masiva de Datos — Lautaro (`Parte1/03_seed.sql`)
 
 - [x] **1.** Script que inserta ≥ 1.000.000 de registros totales (cargados ~1.74M).
 
-### C. Estrategias de Indexación — Mariano (`sql/02_indexes.sql`)
+### C. Estrategias de Indexación — Mariano (`Parte1/02_indexes.sql`)
 
 - [x] **1.** **B-Tree** (rangos/igualdad, ej. `venta.fecha_venta`).
 - [x] **2.** **Hash** (igualdad exacta en texto, ej. `cliente.email` / `sku.codigo_barras`).
@@ -22,9 +22,9 @@ PostgreSQL. Marquen `[x]` lo completado. Cada casilla debe tener respaldo en có
 
 - [x] **1.** `EXPLAIN ANALYZE` de una consulta antes y después del índice (`TAREAS.md` · sección PERFORMANCE).
 - [x] **2.** 2 diagramas Dalibo/PEV2 (`docs/dalibo/`).
-- [ ] **3.** ⚠️ **pg_stat_statements**: top-5 consultas más frecuentes/lentas. *(borrador listo en `sql/06_pg_stat_statements.sql`; requiere `shared_preload_libraries` + reinicio para medir en vivo).*
+- [ ] **3.** ⚠️ **pg_stat_statements**: top-5 consultas más frecuentes/lentas. *(borrador listo en `Parte1/06_pg_stat_statements.sql`; requiere `shared_preload_libraries` + reinicio para medir en vivo).*
 
-### E. SQL Avanzado — Gabriel (`sql/04_queries.sql`, `sql/05_advanced_sql.sql`)
+### E. SQL Avanzado — Gabriel (`Parte1/04_queries.sql`, `Parte1/05_advanced_sql.sql`)
 
 - [x] **1.** **Window Functions** (≥1 métrica analítica: ranking / running total).
 - [x] **2.** **CTE Recursiva** sobre estructura jerárquica (categorías y/o organigrama).

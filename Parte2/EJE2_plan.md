@@ -1,21 +1,21 @@
 # Eje II — Programación en el Servidor (Thick DB) · Plan de trabajo
 
-PostgreSQL / PL-pgSQL. Cada parte (A–E) es de un responsable; los archivos se
-agregan **aditivamente** en `scripts/` (NO se renombra ni mueve nada mientras
-hay ramas en vuelo — evita conflictos entre los 4 hosts).
+PostgreSQL / PL-pgSQL. Cada parte (A–E) es de un responsable; los archivos viven
+en `Parte2/` (antes `scripts/`, renombrado en la reorganización de carpetas por Parte).
 
 ## Reparto y estado
 
 | Parte | Qué pide | Responsable | Archivo | Estado |
 |---|---|---|---|---|
-| **A** | Función (volatilidad) + Procedure + %TYPE/%ROWTYPE | Federico | `scripts/05_procedures.sql` | ✅ Hecho |
-| **B** | Transacciones: COMMIT/ROLLBACK + SAVEPOINT + ROLLBACK TO | **Gabriel** | `scripts/07_transacciones.sql` | ✅ Hecho |
-| **C** | Auditoría: tabla `audit_logs` + EXCEPTION + GET STACKED DIAGNOSTICS | *(libre)* | `scripts/08_auditoria.sql` | ⬜ Pendiente |
-| **D** | Seguridad: SECURITY DEFINER + search_path fijo | **Gabriel** | `scripts/06_seguridad_hardening.sql` | ✅ Hecho |
-| **E** | Trigger BEFORE/AFTER con OLD/NEW | **Mariano** | `scripts/09_triggers.sql` | ⬜ Pendiente |
+| **A** | Función (volatilidad) + Procedure + %TYPE/%ROWTYPE | Federico | `Parte2/05_procedures.sql` | ✅ Hecho |
+| **B** | Transacciones: COMMIT/ROLLBACK + SAVEPOINT + ROLLBACK TO | **Gabriel** | `Parte2/07_transacciones.sql` | ✅ Hecho |
+| **C** | Auditoría: tabla `audit_logs` + EXCEPTION + GET STACKED DIAGNOSTICS | Lautaro | `Parte2/08_auditoria_y_forense.sql` | ✅ Hecho |
+| **D** | Seguridad: SECURITY DEFINER + search_path fijo | **Gabriel** | `Parte2/06_seguridad_hardening.sql` | ✅ Hecho |
+| **E** | Trigger BEFORE/AFTER con OLD/NEW | **Mariano** | `Parte2/09_triggers.sql` | ✅ Hecho |
 
-> C queda libre (p. ej. Lautaro). Checklist oficial de la profe trackeado en
-> [`checklist.md`](../checklist.md) (raíz del repo).
+> **Eje II completo: A · B · C · D · E ✅**
+
+> Checklist oficial trackeado en [`../docs/checklists/eje2-thickdb.md`](../docs/checklists/eje2-thickdb.md).
 
 ## Dependencias técnicas (importante para no chocar entre partes)
 
@@ -41,6 +41,6 @@ hay ramas en vuelo — evita conflictos entre los 4 hosts).
 ## Cómo correr lo que ya está
 
 ```bash
-psql -d ferret_db -f scripts/05_procedures.sql        # A
-psql -d ferret_db -f scripts/06_seguridad_hardening.sql # D
+psql -d ferret_db -f Parte2/05_procedures.sql        # A
+psql -d ferret_db -f Parte2/06_seguridad_hardening.sql # D
 ```

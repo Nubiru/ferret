@@ -28,11 +28,11 @@ Mientras A termina, los otros tres pueden ir leyendo el schema borrador y armand
 
 **Entregables:**
 
-- [ ] Revisar `sql/01_schema.sql` (borrador inicial ya creado) y ajustar junto con el equipo.
+- [ ] Revisar `Parte1/01_schema.sql` (borrador inicial ya creado) y ajustar junto con el equipo.
 - [ ] Documentar el concepto del negocio (sección en `docs/concepto.md` o ampliar README).
 - [ ] Generar el **DER normalizado a 3NF** en DBeaver → exportar a `docs/DER.png` o `docs/DER.pdf`.
 - [ ] Verificar que el modelo cumple 3NF (sin dependencias transitivas, sin atributos multivaluados).
-- [ ] Dejar listo el `sql/01_schema.sql` aplicable limpio contra una DB vacía.
+- [ ] Dejar listo el `Parte1/01_schema.sql` aplicable limpio contra una DB vacía.
 
 **Puntos de atención:**
 
@@ -50,7 +50,7 @@ Mientras A termina, los otros tres pueden ir leyendo el schema borrador y armand
 
 **Entregables:**
 
-- [ ] Poblar `sql/03_seed.sql` (o scripts en `scripts/` si usan Python + Faker).
+- [ ] Poblar `Parte1/03_seed.sql` (o scripts en `Parte2/` si usan Python + Faker).
 - [ ] Orden sugerido y volúmenes objetivo:
 
   | Tabla                                 | Registros objetivo                    |
@@ -91,7 +91,7 @@ Mientras A termina, los otros tres pueden ir leyendo el schema borrador y armand
 
 **Entregables:**
 
-- [ ] Poblar `sql/02_indexes.sql` con cada tipo de índice pedido + justificación en comentario:
+- [ ] Poblar `Parte1/02_indexes.sql` con cada tipo de índice pedido + justificación en comentario:
   - **B-Tree**: `venta.fecha_venta`, `movimiento_stock.fecha`, FKs más consultadas.
   - **Hash**: `cliente.email`, `sku.codigo_barras`.
   - **GIN**: `producto.atributos` (JSONB) con `jsonb_path_ops`.
@@ -210,7 +210,7 @@ tiempo por nodo
 
 **Responsable:** Gabriel — [@Nubiru](https://github.com/Nubiru)
 
-**Entregables en `sql/04_queries.sql`:**
+**Entregables en `Parte1/04_queries.sql`:**
 
 - [ ] **Window Functions** (al menos 2):
   - Ranking de top vendedores por sucursal (`RANK()` sobre total vendido).
@@ -237,10 +237,10 @@ tiempo por nodo
 
 ## Checklist general del grupo (antes de entregar)
 
-- [ ] `sql/01_schema.sql` aplica limpio en DB vacía.
-- [ ] `sql/03_seed.sql` carga ≥ 1.000.000 registros sin errores.
-- [ ] `sql/02_indexes.sql` crea todos los índices requeridos.
-- [ ] `sql/04_queries.sql` corre todas las consultas sin error.
+- [ ] `Parte1/01_schema.sql` aplica limpio en DB vacía.
+- [ ] `Parte1/03_seed.sql` carga ≥ 1.000.000 registros sin errores.
+- [ ] `Parte1/02_indexes.sql` crea todos los índices requeridos.
+- [ ] `Parte1/04_queries.sql` corre todas las consultas sin error.
 - [ ] DER exportado en `docs/`.
 - [ ] `docs/performance.md` con EXPLAIN ANALYZE antes/después.
 - [ ] 2 diagramas Dalibo en `docs/dalibo/`.

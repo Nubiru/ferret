@@ -32,7 +32,15 @@ pg_dump_*.sql
 dumps/
 backups/
 
-# --- Python (si usamos scripts/ con Faker) ---
+# --- Node.js (backends de Parte 3 / Eje IV: Parte3/Gabriel, Parte3/Lautaro, etc.) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+package-lock.json.bak
+
+# --- Python (si usamos Faker para los seeds) ---
 __pycache__/
 *.py[cod]
 *$py.class
