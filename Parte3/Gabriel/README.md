@@ -44,6 +44,20 @@ Variables de entorno (todas opcionales): `REDIS_URL`, `PGHOST`, `PGPORT`, `PGDAT
 | `PUT` | `/api/productos/:id` | Modifica `nombre`. Invalida `productos:*`. |
 | `DELETE` | `/api/productos/:id` | Baja **lógica** (`activo=false`, nunca `DELETE FROM`). Invalida `productos:*`. |
 
+## ¿Por qué Parte 3 y Parte 4 están en la misma carpeta?
+
+Porque la **consigna de Parte 4 lo pide así**: *"Deberán **agregar a su archivo `index.js`** … al menos tres nuevos endpoints."* La Parte 4 (Eje IV) **extiende el mismo backend** de la Parte 3 (Eje III) — es un único `server.js`. Separar el código en dos carpetas obligaría a duplicar el servidor. Por eso conviven aquí, claramente etiquetados.
+
+### Parte 4 (Eje IV) — requisito de la consigna → dónde está implementado
+
+| Requisito Parte 4 | Implementación |
+|---|---|
+| **1. CREATE (POST)** — body JSON, `201` + registro insertado | `server.js` → `POST /api/productos` |
+| **2. UPDATE (PUT)** — id en `req.params`, valor en body | `server.js` → `PUT /api/productos/:id` |
+| **3. DELETE lógico** — columna `activo`, `UPDATE` (nunca `DELETE FROM`) | `server.js` → `DELETE /api/productos/:id` |
+| **4. Invalidación selectiva** — `keys()`+`del()`, prohibido `flushDb()` | `cache.js` → `invalidarNamespace('productos')` |
+| **Manejo de errores** — `400` / `404` | validaciones en cada ruta de `server.js` |
+
 ## Validación end-to-end (hecha contra Redis + ferret_db reales)
 
 ```
@@ -57,8 +71,10 @@ POST sin nombre   → 400
 PUT id inexistente→ 404
 ```
 
-## Pendiente (paso manual del equipo)
+## Evidencia para la entrega (Parte 4)
 
-- [ ] **Evidencia Postman** (Eje IV): 3–4 capturas de POST/PUT/DELETE con respuestas 200/201 → guardar en `docs/postman/`.
+- **Colección Postman lista para importar:** [`ferret-parte4.postman_collection.json`](ferret-parte4.postman_collection.json) — trae POST, PUT, DELETE y los casos 400/404 ya armados.
+- **Transcript de la corrida real** (curl contra Redis + ferret_db): [`EVIDENCIA.md`](EVIDENCIA.md).
+- ⬜ **Falta (paso manual con GUI):** importar la colección, hacer *Send* en POST/PUT/DELETE y sacar las **3–4 capturas** → guardarlas en `evidencia/`. (Esto necesita la app Postman; no se puede automatizar.)
 
-Checklists oficiales: [`docs/checklists/eje3-redis.md`](../docs/checklists/eje3-redis.md) y [`docs/checklists/eje4-crud.md`](../docs/checklists/eje4-crud.md).
+Checklists oficiales: [`../../docs/checklists/eje3-redis.md`](../../docs/checklists/eje3-redis.md) y [`../../docs/checklists/eje4-crud.md`](../../docs/checklists/eje4-crud.md).

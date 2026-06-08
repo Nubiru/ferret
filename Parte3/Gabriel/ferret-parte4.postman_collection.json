@@ -1,0 +1,124 @@
+{
+  "info": {
+    "name": "FeRReT — Parte 4 (Eje IV: CRUD + Invalidación Selectiva)",
+    "description": "Endpoints CRUD sobre PostgreSQL (ferret_db) con caché Redis. Backend: Parte3/Gabriel/server.js. Correr en orden: el POST guarda el id creado en la variable {{nuevoId}} que usan el PUT y el DELETE.\n\nLevantar antes:\n  podman run -d --name ferret-redis -p 6380:6379 docker.io/library/redis:7\n  cd Parte3/Gabriel && npm install && REDIS_URL=redis://localhost:6380 npm start",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "nuevoId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. CREATE — POST /api/productos (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 201', () => pm.response.to.have.status(201));",
+              "const id = pm.response.json().producto.id;",
+              "pm.collectionVariables.set('nuevoId', id);",
+              "console.log('id creado =', id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Taladro Percutor X9\",\n  \"categoria_id\": 1,\n  \"marca_id\": 1\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/productos", "host": ["{{baseUrl}}"], "path": ["api", "productos"] }
+      }
+    },
+    {
+      "name": "2. UPDATE — PUT /api/productos/:id (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["pm.test('status 200', () => pm.response.to.have.status(200));"],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Taladro Percutor X9 PRO\"\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/productos/{{nuevoId}}", "host": ["{{baseUrl}}"], "path": ["api", "productos", "{{nuevoId}}"] }
+      }
+    },
+    {
+      "name": "3. DELETE lógico — DELETE /api/productos/:id (200, activo=false)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('baja logica (activo=false)', () => pm.expect(pm.response.json().baja_logica.activo).to.eql(false));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/productos/{{nuevoId}}", "host": ["{{baseUrl}}"], "path": ["api", "productos", "{{nuevoId}}"] }
+      }
+    },
+    {
+      "name": "4a. ERROR 400 — POST sin nombre",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["pm.test('status 400', () => pm.response.to.have.status(400));"],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"categoria_id\": 1\n}" },
+        "url": { "raw": "{{baseUrl}}/api/productos", "host": ["{{baseUrl}}"], "path": ["api", "productos"] }
+      }
+    },
+    {
+      "name": "4b. ERROR 404 — PUT a id inexistente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["pm.test('status 404', () => pm.response.to.have.status(404));"],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"x\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/productos/999999999", "host": ["{{baseUrl}}"], "path": ["api", "productos", "999999999"] }
+      }
+    },
+    {
+      "name": "0. (opcional) GET /api/productos — ver cache HIT/MISS",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/productos", "host": ["{{baseUrl}}"], "path": ["api", "productos"] }
+      }
+    }
+  ]
+}
