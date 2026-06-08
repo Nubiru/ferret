@@ -3,8 +3,8 @@
 API REST sobre PostgreSQL con caché Redis consistente. Implementado en [`Parte3/Gabriel/`](../../Parte3/Gabriel/).
 Entidad elegida: **`producto`** (ya tiene columna `activo` → baja lógica sin tocar el schema).
 
-> **Reparto:** invalidación selectiva (`cache.js`) = **Gabriel**. Scaffold + CRUD plano (`server.js`) = equipo
-> (Gabriel dejó una base funcional y validada para que el compañero la tome).
+> **Reparto:** backend completo de Parte 4 = **Gabriel** — CRUD (`server.js`) + invalidación selectiva (`cache.js`),
+> sobre el mismo backend de la Parte 3 (la consigna pide *"agregar endpoints a su `index.js`"*).
 
 ### Endpoints (≥ 3 sobre las tablas principales)
 
@@ -20,13 +20,14 @@ Entidad elegida: **`producto`** (ya tiene columna `activo` → baja lógica sin 
 
 ### Testing y Validación con Postman
 
-- [x] Manejo de errores: la API devuelve **400** (body inválido) y **404** (no encontrado) *(validado por código)*.
-- [ ] ⏳ **Evidencia:** 3–4 capturas de Postman ejecutando POST, PUT y DELETE con respuestas 200/201. *(paso manual — falta sacar las screenshots y guardarlas en `docs/postman/`).*
+- [x] Manejo de errores: la API devuelve **400** (body inválido) y **404** (no encontrado) *(validado, ver EVIDENCIA.md)*.
+- [x] **Colección Postman lista:** [`Parte3/Gabriel/ferret-parte4.postman_collection.json`](../../Parte3/Gabriel/ferret-parte4.postman_collection.json) (POST/PUT/DELETE + 400/404 pre-armados).
+- [ ] ⏳ **Capturas:** importar la colección, hacer *Send* y sacar 3–4 screenshots → `Parte3/Gabriel/evidencia/`. *(paso manual con GUI — no se puede automatizar).*
 
 ### Formato de Entrega
 
-- [ ] Repo actualizado con el backend (`Parte3/Gabriel/`). *(falta el commit/PR)*
-- [ ] Archivo con las capturas de Postman.
+- [x] Repo actualizado con el backend (`Parte3/Gabriel/`) — mergeado en `main`.
+- [ ] Archivo con las capturas de Postman (`Parte3/Gabriel/evidencia/`).
 
 ---
 
