@@ -1,0 +1,30 @@
+# =====================================================================
+# docker-compose.yml — Redis para el backend (Parte 3/4)
+# =====================================================================
+# Levanta SOLO Redis (lo unico molesto de instalar). PostgreSQL no va
+# aca a proposito: cada integrante ya tiene su ferret_db local con los
+# datos cargados; un Postgres de compose vendria vacio.
+#
+# Funciona igual con podman o con docker:
+#     podman-compose up -d        (o)     docker compose up -d
+#     podman-compose down         (o)     docker compose down
+#
+# Mapea al puerto 6380 del host para NO chocar con un Redis nativo que
+# ya tengas en 6379. Luego arranca el backend asi:
+#     REDIS_URL=redis://localhost:6380 npm start
+#
+# Si NO tenes Redis nativo y preferis el puerto estandar, cambia el
+# mapeo a "6379:6379" y arranca con `npm start` a secas.
+# =====================================================================
+services:
+  redis:
+    image: docker.io/library/redis:7
+    container_name: ferret-redis
+    ports:
+      - "6380:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5

@@ -22,18 +22,44 @@ Parte3/Gabriel/
 
 ## Cómo correr
 
-```bash
-# 1. Redis (con podman; si el host ya usa 6379, mapear a otro puerto)
-podman run -d --name ferret-redis -p 6380:6379 docker.io/library/redis:7
+**Paso 1 — Redis (elegí UNA opción):**
 
-# 2. Backend
+```bash
+# Opción A — ya tenés Redis nativo en 6379 (lo más simple):
+redis-cli ping            # PONG → no hacés nada, el backend usa 6379 por defecto
+
+# Opción B — sin instalar nada, con Docker o Podman (compose):
+docker compose up -d      # o:  podman-compose up -d   → levanta Redis en 6380
+
+# Opción C — un solo contenedor a mano:
+podman run -d --name ferret-redis -p 6380:6379 docker.io/library/redis:7
+```
+
+**Paso 2 — Crear el rol de la API (una sola vez por máquina):**
+
+```bash
+psql -d ferret_db -f rol_api.sql     # crea ferret_api (privilegio mínimo)
+```
+> Por defecto la API se conecta como **`ferret_api`** (no superusuario), así que
+> este paso es obligatorio. Ver "Privilegio mínimo" abajo.
+
+**Paso 3 — Backend:**
+
+```bash
 cd Parte3/Gabriel
 npm install
-REDIS_URL=redis://localhost:6380 npm start      # usa ferret_db por socket local
+npm start                                    # ya corre como ferret_api, Redis 6379
+# --- o, si usaste compose / contenedor en 6380: ---
+REDIS_URL=redis://localhost:6380 npm start
 # → [api] escuchando en http://localhost:3000
 ```
 
-Variables de entorno (todas opcionales): `REDIS_URL`, `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`, `PORT`.
+> **¿No usás podman/docker?** No hace falta: si tenés Redis instalado nativo
+> (`redis-server`), el backend se conecta solo a `redis://localhost:6379`.
+> Y aunque **no haya Redis ninguno**, la app **igual arranca** y sirve desde
+> PostgreSQL (`origen: db (redis-caido)`) — la caché es opcional por diseño.
+
+Variables de entorno (todas opcionales): `REDIS_URL`, `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`, `PORT`. El compose está en [`docker-compose.yml`](docker-compose.yml).
 
 ## Endpoints
 
@@ -43,6 +69,22 @@ Variables de entorno (todas opcionales): `REDIS_URL`, `PGHOST`, `PGPORT`, `PGDAT
 | `POST` | `/api/productos` | Alta → `201`. Body: `{nombre, categoria_id, marca_id?, atributos?}`. Invalida `productos:*`. |
 | `PUT` | `/api/productos/:id` | Modifica `nombre`. Invalida `productos:*`. |
 | `DELETE` | `/api/productos/:id` | Baja **lógica** (`activo=false`, nunca `DELETE FROM`). Invalida `productos:*`. |
+| `POST` | `/api/venta` | **Delega** en el procedure `registrar_venta_simple` (Eje II·A) vía `CALL`. Nexo Eje IV↔II: la API orquesta, la DB decide. |
+
+## Privilegio mínimo (la API NO corre como superusuario)
+
+[`rol_api.sql`](rol_api.sql) crea el rol **`ferret_api`** con permisos
+acotados: `SELECT` en el catálogo, `INSERT/UPDATE` en `producto`, y `EXECUTE`
+del procedure de venta + la función `ultima_venta` (ambos `SECURITY DEFINER`).
+**No** tiene `DELETE` físico ni acceso directo a `venta`/`stock`/`cliente`.
+
+**Es el comportamiento por defecto:** `db.js` se conecta como `ferret_api`
+(TCP + password) sin que haga falta exportar nada — por eso el Paso 2 es
+obligatorio. Para correr como otro usuario, exportá `PGUSER`/`PGPASSWORD`/`PGHOST`.
+
+Demo en vivo (sin reconectar): `SET ROLE ferret_api;` → `SELECT FROM producto` anda,
+`SELECT FROM venta` da *permission denied*, `DELETE FROM producto` da *permission
+denied*, `CALL registrar_venta_simple(...)` anda (delegación vía `SECURITY DEFINER`).
 
 ## ¿Por qué Parte 3 y Parte 4 están en la misma carpeta?
 
@@ -74,6 +116,7 @@ PUT id inexistente→ 404
 ## Evidencia para la entrega (Parte 4)
 
 - **Colección Postman lista para importar:** [`ferret-parte4.postman_collection.json`](ferret-parte4.postman_collection.json) — trae POST, PUT, DELETE y los casos 400/404 ya armados.
+- **Guía paso a paso para sacar las capturas:** [`evidencia/COMO_SACAR_CAPTURAS.md`](evidencia/COMO_SACAR_CAPTURAS.md).
 - **Transcript de la corrida real** (curl contra Redis + ferret_db): [`EVIDENCIA.md`](EVIDENCIA.md).
 - ⬜ **Falta (paso manual con GUI):** importar la colección, hacer *Send* en POST/PUT/DELETE y sacar las **3–4 capturas** → guardarlas en `evidencia/`. (Esto necesita la app Postman; no se puede automatizar.)
 

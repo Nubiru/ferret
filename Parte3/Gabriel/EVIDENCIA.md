@@ -42,6 +42,32 @@ REDIS_URL=redis://localhost:6380 npm start
     => se borró solo el namespace del catálogo, NO se usó flushDb()
 ```
 
+## Endpoint extra — POST /api/venta (delegación en el procedure, Eje IV↔II)
+
+```
+POST /api/venta {cliente_id:1,empleado_id:1,sucursal_id:1,sku_id:1,cantidad:2}
+    → HTTP 201  {"mensaje":"Venta registrada por el procedure",
+                 "venta":{"id":"...","total":"532.62",...}}
+POST /api/venta ... cantidad:999999999  (stock imposible)
+    → HTTP 400  {"error":"Stock insuficiente"}   ← lo lanza el RAISE del procedure, no Node
+POST /api/venta {cliente_id:1}  (body incompleto)
+    → HTTP 400  {"error":"faltan campos: ..."}
+```
+
+## Privilegio mínimo — la API como rol `ferret_api` (no superusuario)
+
+Verificado con `SET ROLE ferret_api` (ver `rol_api.sql`):
+```
+SELECT count(*) FROM producto;          → 30000        (OK: tiene SELECT)
+INSERT INTO producto(...) ...           → INSERT 0 1    (OK: POST)
+UPDATE producto SET activo=false ...    → UPDATE 1      (OK: baja lógica)
+SELECT count(*) FROM venta;             → ERROR: permission denied for table venta
+DELETE FROM producto ...                → ERROR: permission denied  (no hay DELETE físico)
+CALL registrar_venta_simple(1,1,1,1,1); → CALL          (OK: EXECUTE + SECURITY DEFINER)
+```
+=> El rol lee el catálogo y escribe `producto`, pero NO accede directo a
+`venta`/`stock` ni borra físico. La venta la hace por **delegación** (procedure).
+
 ## Capturas de Postman
 
 Guardar aquí las 3–4 capturas requeridas por la consigna:

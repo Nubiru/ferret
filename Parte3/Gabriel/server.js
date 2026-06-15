@@ -124,6 +124,40 @@ app.delete('/api/productos/:id', async (req, res) => {
 });
 
 // ---------------------------------------------------------------------
+// EJE IV (extra) — POST /api/venta  -> DELEGA en la Thick DB (Eje II)
+// ---------------------------------------------------------------------
+// A diferencia del CRUD de /productos (que escribe SQL plano), este
+// endpoint NO contiene logica de negocio: llama al procedure
+// `registrar_venta_simple` (Eje II.A, de Federico) con CALL. El precio,
+// el control de stock y la atomicidad los garantiza la base, no Node.
+// Es el nexo Eje IV <-> Eje II: "la API orquesta, la DB decide".
+//
+// Nota de cache: una venta NO altera la proyeccion del catalogo
+// (precio_desde / variantes salen de sku, no de stock), asi que no
+// invalidamos 'productos:*'. La invalidacion es SELECTIVA por diseno.
+app.post('/api/venta', async (req, res) => {
+  const { cliente_id, empleado_id, sucursal_id, sku_id, cantidad } = req.body;
+  if ([cliente_id, empleado_id, sucursal_id, sku_id, cantidad].some(v => v == null)) {
+    return res.status(400).json({
+      error: 'faltan campos: cliente_id, empleado_id, sucursal_id, sku_id, cantidad'
+    });
+  }
+  try {
+    // El procedure valida SKU y stock; si falla, RAISE EXCEPTION -> catch.
+    await pool.query('CALL registrar_venta_simple($1,$2,$3,$4,$5)',
+      [cliente_id, empleado_id, sucursal_id, sku_id, cantidad]);
+    // Lectura por delegacion: ferret_api NO puede leer `venta` directo, asi que
+    // la recupera via la funcion SECURITY DEFINER `ultima_venta` (rol_api.sql).
+    const { rows } = await pool.query('SELECT * FROM ultima_venta($1, $2)',
+      [cliente_id, empleado_id]);
+    res.status(201).json({ mensaje: 'Venta registrada por el procedure', venta: rows[0] });
+  } catch (e) {
+    // 'Stock insuficiente' / 'El SKU no existe' vienen del RAISE del procedure.
+    res.status(400).json({ error: e.message });
+  }
+});
+
+// ---------------------------------------------------------------------
 const PORT = process.env.PORT || 3000;
 await initRedis();                               // intenta Redis; si falla, sigue sin cache
 app.listen(PORT, () => console.log(`[api] escuchando en http://localhost:${PORT}`));

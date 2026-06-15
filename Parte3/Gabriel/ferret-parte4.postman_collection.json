@@ -113,6 +113,48 @@
       }
     },
     {
+      "name": "5. POST /api/venta — delega en el procedure (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["pm.test('status 201', () => pm.response.to.have.status(201));"],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente_id\": 1,\n  \"empleado_id\": 1,\n  \"sucursal_id\": 1,\n  \"sku_id\": 1,\n  \"cantidad\": 2\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/venta", "host": ["{{baseUrl}}"], "path": ["api", "venta"] }
+      }
+    },
+    {
+      "name": "5b. POST /api/venta — stock insuficiente (400 desde el RAISE del procedure)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["pm.test('status 400', () => pm.response.to.have.status(400));"],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cliente_id\": 1,\n  \"empleado_id\": 1,\n  \"sucursal_id\": 1,\n  \"sku_id\": 1,\n  \"cantidad\": 999999999\n}"
+        },
+        "url": { "raw": "{{baseUrl}}/api/venta", "host": ["{{baseUrl}}"], "path": ["api", "venta"] }
+      }
+    },
+    {
       "name": "0. (opcional) GET /api/productos — ver cache HIT/MISS",
       "request": {
         "method": "GET",
