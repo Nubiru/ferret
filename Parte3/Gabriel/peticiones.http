@@ -1,0 +1,79 @@
+###############################################################################
+# FeRReT — Parte 4 (Eje IV): CRUD + Invalidación Selectiva
+# -----------------------------------------------------------------------------
+# Cada bloque separado por "###" es un request INDEPENDIENTE. Encima de cada
+# uno, la extensión REST Client muestra un link gris "Send Request": clic ahí
+# y la respuesta se abre en un panel a la derecha (con status, headers y body)
+# -> esa es tu captura.
+#
+# Requisitos: backend corriendo (npm start) + Redis. Sin login, sin importar nada.
+# Mandá en orden 1 -> 2 -> 3 (el PUT y el DELETE reusan el id del POST solos).
+###############################################################################
+
+@baseUrl = http://localhost:3000
+
+### 1. CREATE — POST /api/productos   (espera 201 Created)
+# @name crearProducto
+POST {{baseUrl}}/api/productos
+Content-Type: application/json
+
+{
+  "nombre": "Taladro Percutor X9",
+  "categoria_id": 1,
+  "marca_id": 1
+}
+
+### 2. UPDATE — PUT /api/productos/:id   (espera 200; id reusado del POST de arriba)
+PUT {{baseUrl}}/api/productos/{{crearProducto.response.body.$.producto.id}}
+Content-Type: application/json
+
+{
+  "nombre": "Taladro Percutor X9 PRO"
+}
+
+### 3. DELETE lógico — DELETE /api/productos/:id   (espera 200, "activo": false)
+DELETE {{baseUrl}}/api/productos/{{crearProducto.response.body.$.producto.id}}
+
+### 4a. ERROR 400 — POST sin "nombre"   (espera 400)
+POST {{baseUrl}}/api/productos
+Content-Type: application/json
+
+{
+  "categoria_id": 1
+}
+
+### 4b. ERROR 404 — PUT a id inexistente   (espera 404)
+PUT {{baseUrl}}/api/productos/999999999
+Content-Type: application/json
+
+{
+  "nombre": "x"
+}
+
+### 5. POST /api/venta — delega en el procedure (Eje II)   (espera 201)
+POST {{baseUrl}}/api/venta
+Content-Type: application/json
+
+{
+  "cliente_id": 1,
+  "empleado_id": 1,
+  "sucursal_id": 1,
+  "sku_id": 1,
+  "cantidad": 2
+}
+
+### 5b. POST /api/venta — stock insuficiente   (espera 400 desde el RAISE del procedure)
+POST {{baseUrl}}/api/venta
+Content-Type: application/json
+
+{
+  "cliente_id": 1,
+  "empleado_id": 1,
+  "sucursal_id": 1,
+  "sku_id": 1,
+  "cantidad": 999999999
+}
+
+### 0. (opcional) GET /api/productos — ver Cache HIT/MISS (mandalo 2 veces)
+# 1ª vez: "origen":"db" (MISS) · 2ª vez: "origen":"cache" (HIT). Header X-Cache.
+GET {{baseUrl}}/api/productos
