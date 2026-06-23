@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ferretería | Catálogo de Productos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container mt-5">
+        <header class="text-center mb-5">
+            <h1>Ferret</h1>
+            <p class="text-secondary">Catálogo de productos</p>
+            
+            <button id="btn-cargar" class="btn btn-products mt-3">
+                VER PRODUCTOS
+            </button>
+        </header>
+
+        <div id="contenedor-tabla" class="card-custom" style="display: none;">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-body">
+                    <!-- Filas dinámicas -->
+                </tbody>
+            </table>
+            
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <button id="btn-anterior" class="btn btn-outline-light text-dark" disabled>Anterior</button>
+                <span id="indicador-pagina" class="fw-bold">Página 1</span>
+                <button id="btn-siguiente" class="btn btn-outline-light text-dark">Siguiente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar detalles del producto -->
+    <div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productoModalLabel">Detalles del producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="modal-body-content">
+                    <div class="text-center">Cargando...</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variables globales de paginación
+        let paginaActual = 1;
+        const limitePorPagina = 10;
+
+        // Formateador de moneda (pesos argentinos)
+        function formatearPrecio(valor) {
+            if (valor === undefined || valor === null) return 'N/A';
+            return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(valor);
+        }
+
+        async function fetchCatalogo(paginaAMostrar) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/catalogo?page=${paginaAMostrar}&limit=${limitePorPagina}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const productos = await response.json();
+                const tbody = document.getElementById('tabla-body');
+                tbody.innerHTML = '';
+
+                if (productos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">No hay productos en esta página</td></tr>';
+                } else {
+                    productos.forEach(prod => {
+                        const id = prod.id_producto ?? '-';
+                        const nombre = prod.nombre ?? 'Sin nombre';
+                        const precio = prod.precio_unitario ?? 0;
+                        const stock = prod.stock_total ?? 0;
+                        
+                        tbody.innerHTML += `
+                            <tr style="cursor: pointer;" data-id="${id}" class="producto-fila">
+                                <td>${escapeHtml(String(id))}</td>
+                                <td>${escapeHtml(nombre)}</td>
+                                <td>${formatearPrecio(precio)}</td>
+                                <td>${stock}</td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                document.getElementById('contenedor-tabla').style.display = 'block';
+                document.getElementById('btn-cargar').style.display = 'none';
+                
+                paginaActual = paginaAMostrar;
+                document.getElementById('indicador-pagina').innerText = `Página ${paginaActual}`;
+
+                document.getElementById('btn-anterior').disabled = (paginaActual === 1);
+                document.getElementById('btn-siguiente').disabled = (productos.length < limitePorPagina);
+
+                // Asignar evento click a cada fila después de renderizar
+                document.querySelectorAll('.producto-fila').forEach(fila => {
+                    fila.addEventListener('click', () => {
+                        const productoId = fila.getAttribute('data-id');
+                        if (productoId) {
+                            fetchProductoDetalle(productoId);
+                        }
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error al cargar el catálogo:", error);
+                alert("No se pudo conectar con el servidor. Asegúrate de que el backend esté corriendo en http://localhost:3000");
+            }
+        }
+
+        // Función para obtener y mostrar los detalles de un producto específico
+        async function fetchProductoDetalle(id) {
+            const modalBody = document.getElementById('modal-body-content');
+            modalBody.innerHTML = '<div class="text-center">Cargando detalles...</div>';
+            
+            const modal = new bootstrap.Modal(document.getElementById('productoModal'));
+            modal.show();
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/catalogo/productos/${id}`);
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        modalBody.innerHTML = '<div class="alert alert-danger">Producto no encontrado</div>';
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return;
+                }
+                
+                const data = await response.json();
+                const prod = data.producto;
+                
+                if (!prod) {
+                    modalBody.innerHTML = '<div class="alert alert-warning">No se recibieron datos del producto</div>';
+                    return;
+                }
+                
+                modalBody.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>ID Producto:</strong> ${escapeHtml(String(prod.id_producto ?? '-'))}</p>
+                            <p><strong>Nombre:</strong> ${escapeHtml(prod.nombre ?? '-')}</p>
+                            <p><strong>Categoría:</strong> ${escapeHtml(prod.categoria ?? '-')}</p>
+                            <p><strong>Marca:</strong> ${escapeHtml(prod.marca ?? '-')}</p>
+                            <p><strong>ID SKU:</strong> ${escapeHtml(String(prod.id_sku ?? '-'))}</p>
+                            <p><strong>Código de barras:</strong> ${escapeHtml(prod.codigo_barras ?? '-')}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Variante:</strong> ${escapeHtml(prod.descripcion_variante ?? '-')}</p>
+                            <p><strong>Precio unitario:</strong> ${formatearPrecio(prod.precio_unitario)}</p>
+                            <p><strong>Unidad de medida:</strong> ${escapeHtml(prod.unidad_medida ?? '-')}</p>
+                            <p><strong>Peso (gramos):</strong> ${prod.peso_gramos ?? '-'}</p>
+                            <p><strong>Stock total:</strong> ${prod.stock_total ?? 0}</p>
+                            <p><strong>SKU activo:</strong> ${prod.sku_activo ? 'Sí' : 'No'}</p>
+                            <p><strong>Producto activo:</strong> ${prod.producto_activo ? 'Sí' : 'No'}</p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error al obtener detalle del producto:', error);
+                modalBody.innerHTML = '<div class="alert alert-danger">Error de conexión al servidor</div>';
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Listeners de los botones
+        document.getElementById('btn-cargar').addEventListener('click', () => {
+            fetchCatalogo(1);
+        });
+
+        document.getElementById('btn-anterior').addEventListener('click', () => {
+            if (paginaActual > 1) {
+                fetchCatalogo(paginaActual - 1);
+            }
+        });
+
+        document.getElementById('btn-siguiente').addEventListener('click', () => {
+            fetchCatalogo(paginaActual + 1);
+        });
+    </script>
+</body>
+</html>
